@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 
 
@@ -15,9 +16,10 @@ public class CRUDoperations {
 	
 	private Connection conn; //connection to db
 	private Statement stmt;  //query statement for SQL 
-	private ResultSet rs; 	 //results returned from SQL db
+	public ResultSet rs; 	 //results returned from SQL db
 	
 	public String forTest;
+	public String created;
 	public String deleted;
 	public String updated;
 	
@@ -27,9 +29,11 @@ public class CRUDoperations {
 			//created methods to get credentials, as previously not visible to this class
 			conn = DriverManager.getConnection(DBconfig.getUrl(), DBconfig.getUser(), DBconfig.getPass());
 			this.stmt = conn.createStatement();
-			System.out.println("connection successful");
-			forTest = "Okay";
-		} catch(SQLException e) {
+			
+			forTest = "connection successful";
+			System.out.println(forTest);
+			
+		} catch(SQLException e) { 
 			System.out.println("incorrect credentials");
 			e.printStackTrace();
 			forTest = "NotOkay";
@@ -42,21 +46,49 @@ public class CRUDoperations {
 		
 		try {
 			stmt.executeUpdate(createItem);
+			
 			System.out.println("new item added to labs database");
 			return item;
 		} catch(SQLException e) {
+			
 			System.out.println("bad query");
 			e.printStackTrace();
 			return item;
 		}
 	}
 	
-	public ResultSet read() {
+	public void read() {
+		
 		String readData = "SELECT*FROM equipment;";
 		try {
 			rs = stmt.executeQuery(readData);
 			
 			while(rs.next()) {
+				
+				ArrayList<String> readList = new ArrayList<String>();	
+				String[] colNames = {"ID: ", "Name: ", "Description: ", "Department: ", "Quantity: ","Stored By: ", "Date Stored: "};
+				
+				String rid = Integer.toString(rs.getInt("item_id"));
+				String rname = rs.getString("item_name");
+				String rdesc = rs.getString("item_desc");
+				String rdept = rs.getString("dept");
+				String rquant = Integer.toString(rs.getInt("quantity"));
+				String rbywhom = rs.getString("stored_by");
+				String rdate = rs.getString("store_date");
+								
+				readList.add(rid); 
+				readList.add(rname); 
+				readList.add(rdesc);
+				readList.add(rdept);
+				readList.add(rquant); 
+				readList.add(rbywhom);
+				readList.add(rdate);
+				
+				for(int i =0; i<readList.size(); i++ ) {
+					System.out.println(colNames[i]+readList.get(i).toString());
+				}
+				
+				/*
 				System.out.println("ID: "+ rs.getInt("item_id"));
 				System.out.println("item name: "+rs.getString("item_name"));
 				System.out.println("item description: "+rs.getString("item_desc"));
@@ -64,16 +96,14 @@ public class CRUDoperations {
 				System.out.println("quantity: "+rs.getInt("quantity"));
 				System.out.println("stored by: "+rs.getString("stored_by"));
 				System.out.println("date stored: "+rs.getString("store_date"));
-				
+				*/
 			}
 			
-			return rs;
 			
 		} catch(SQLException e) {
 			System.out.println("Bad query");
 			e.printStackTrace();
 			
-			return rs;
 		}
 	}
 	
