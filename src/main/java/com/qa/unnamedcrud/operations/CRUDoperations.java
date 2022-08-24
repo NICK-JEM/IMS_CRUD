@@ -16,12 +16,16 @@ public class CRUDoperations {
 	
 	private Connection conn; //connection to db
 	private Statement stmt;  //query statement for SQL 
-	public ResultSet rs; 	 //results returned from SQL db
+	private ResultSet rs; 	 //results returned from SQL db
 	
 	public String forTest;
 	public String created;
-	public String deleted;
-	public String updated;
+	public String confirm;
+	public boolean deleted;
+	public boolean updated;	
+	public ArrayList<Object> readList = new ArrayList<>();
+	
+	
 	
 	public CRUDoperations() {
 		//attempt to open a connection using credentials stored in DBconfig
@@ -57,7 +61,7 @@ public class CRUDoperations {
 		}
 	}
 	
-	public void read() {
+	public ArrayList<Object> read() {
 		
 		String readData = "SELECT*FROM equipment;";
 		try {
@@ -65,78 +69,72 @@ public class CRUDoperations {
 			
 			while(rs.next()) {
 				
-				ArrayList<String> readList = new ArrayList<String>();	
-				String[] colNames = {"ID: ", "Name: ", "Description: ", "Department: ", "Quantity: ","Stored By: ", "Date Stored: "};
 				
-				String rid = Integer.toString(rs.getInt("item_id"));
+				int rid = rs.getInt("item_id");
 				String rname = rs.getString("item_name");
 				String rdesc = rs.getString("item_desc");
 				String rdept = rs.getString("dept");
-				String rquant = Integer.toString(rs.getInt("quantity"));
+				int rquant = rs.getInt("quantity");
 				String rbywhom = rs.getString("stored_by");
 				String rdate = rs.getString("store_date");
-								
-				readList.add(rid); 
-				readList.add(rname); 
-				readList.add(rdesc);
-				readList.add(rdept);
-				readList.add(rquant); 
-				readList.add(rbywhom);
-				readList.add(rdate);
+				
+				
+				//add object to list 
+				Equipment reading = new Equipment(rid, rname, rdesc, rdept, rquant, rbywhom, rdate);
+				readList.add((reading)); 
+				
 				
 				for(int i =0; i<readList.size(); i++ ) {
-					System.out.println(colNames[i]+readList.get(i).toString());
+					System.out.println(readList.get(i).toString());
+					
 				}
-				
-				/*
-				System.out.println("ID: "+ rs.getInt("item_id"));
-				System.out.println("item name: "+rs.getString("item_name"));
-				System.out.println("item description: "+rs.getString("item_desc"));
-				System.out.println("department: "+rs.getString("dept"));
-				System.out.println("quantity: "+rs.getInt("quantity"));
-				System.out.println("stored by: "+rs.getString("stored_by"));
-				System.out.println("date stored: "+rs.getString("store_date"));
-				*/
+					
 			}
+			return readList;
 			
-			
-		} catch(SQLException e) {
+		} catch(SQLException e) { 
 			System.out.println("Bad query");
 			e.printStackTrace();
+			return null;
 			
 		}
 	}
 	
-	public void update(int item_id, String upItemName, String upItemDesc, String upDept, int upQuant, String upByWhom, String upStoreDate) {
+	public boolean update(int item_id, String upItemName, String upItemDesc, String upDept, int upQuant, String upByWhom, String upStoreDate) {
 		
 		String upStmt = "UPDATE equipment SET item_name = '"+upItemName+"', item_desc = '"+upItemDesc+"', dept = '"+upDept+"', quantity = "+upQuant+", stored_by = '"+upByWhom+"', store_date = '"+upStoreDate+"' WHERE item_id = "+item_id+"; ";
 		
 		try {
 			stmt.executeUpdate(upStmt);
-			updated = "update successful";
-			System.out.println(updated);
+			updated = true;
+			System.out.println("update successful");
 		} catch(SQLException e){
-			updated = "bad query";
-			System.out.println(updated);
+			updated = false;
+			System.out.println("bad query");
 			e.printStackTrace();
 			
 		}
-		
+		return updated;
 	}
 	
-	public void delete(int item_id) {
+	public boolean delete(int item_id) {
 		String delStmt = "DELETE FROM equipment WHERE item_id="+ item_id+";";
+		
+		//IMPLEMENT THE AUTO INC RESET IF TABLE EMPTY (to do after MVP passes)
+		//String reset = "ALTER TABLE equipment AUTO_INCREMENT = 1";
+		
+		//return bool
 		
 		try {
 			stmt.executeUpdate(delStmt);
-			deleted = "record successfully removed from database.";
-			System.out.println(deleted);
+			deleted = true;
+			System.out.println("record successfully removed from database.");
 		} catch(SQLException e) {
-			deleted = "bad query";
-			System.out.println(deleted);
+			deleted = false;
+			System.out.println("bad query");
 			e.printStackTrace();
-		}
-		
+		} 
+		return deleted;
 	}
 	
 	

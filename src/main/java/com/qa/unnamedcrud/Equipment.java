@@ -1,5 +1,7 @@
 package com.qa.unnamedcrud;
 
+import java.util.Objects;
+
 public class Equipment {
 	
 	private int item_id;
@@ -26,6 +28,25 @@ public class Equipment {
 		this.store_date = store_date;
 	}
 	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dept, item_desc, item_id, item_name, quantity, store_date, stored_by);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Equipment other = (Equipment) obj;
+		return Objects.equals(dept, other.dept) && Objects.equals(item_desc, other.item_desc)
+				&& item_id == other.item_id && Objects.equals(item_name, other.item_name) && quantity == other.quantity
+				&& Objects.equals(store_date, other.store_date) && Objects.equals(stored_by, other.stored_by);
+	}
 
 	public Equipment(String item_name, String item_desc, String dept, int quantity, String stored_by, String store_date) {
 		super();

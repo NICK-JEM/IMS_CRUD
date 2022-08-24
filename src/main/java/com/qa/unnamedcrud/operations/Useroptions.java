@@ -7,6 +7,7 @@ import com.qa.unnamedcrud.Equipment;
 
 
 public class Useroptions {
+	
 	//instantiates new scanner for user input
 	private static Scanner scan = new Scanner(System.in);
 	
@@ -14,12 +15,15 @@ public class Useroptions {
 	Equipment equip = new Equipment();
 	
 	//method to get user input in terminal
+
+	public String output;
+	
 	public String getInput() {
-		System.out.println("Enter CRUD choice: (store or read for now)");
+		System.out.println("Enter CRUD choice: (create, read, update or delete)");
 		return scan.nextLine();
 	}
 	
-	public void choices() {
+	public String choices() {
 		
 		//new instance of CRUDoperations to open connection
 		CRUDoperations op = new CRUDoperations();
@@ -33,7 +37,7 @@ public class Useroptions {
 			do {
 				switch (crud.toLowerCase()) {
 				
-				case "store":
+				case "create":
 					
 					System.out.println("Enter item name: (max 100 characters) ");
 					String itName = scan.nextLine();
@@ -61,10 +65,12 @@ public class Useroptions {
 					equip.setDate(itDate);
 					
 					op.create(new Equipment(itName, itDesc, itDept, itQuant, itByWhom, itDate ));
+					output = "created";
 					break;
 					
 				case "read":
 					op.read();
+					output = "read it";
 					break;
 					
 				case "update":
@@ -92,6 +98,7 @@ public class Useroptions {
 					String upNewDate = scan.nextLine();
 					
 					op.update(upId, upName, upDes, upDep, upQuan, upBy, upNewDate);
+					output = "updated";
 					break;
 					
 					
@@ -101,11 +108,14 @@ public class Useroptions {
 					scan.nextLine();
 					
 					op.delete(id);
+					output = "delete it";
 					break;
 					
 				default:
 					System.out.println("Invalid option");
+					output = "oops";
 				}
+			
 				
 				System.out.println("Would you like to continue? (y/n)");
 				String quit = scan.nextLine();
@@ -126,7 +136,7 @@ public class Useroptions {
 			op.closeConn();
 			
 		}
-		
+		return output;
 	}
 
 }
